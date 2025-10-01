@@ -13,6 +13,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.Headers
 import org.json.JSONException
 
+
 fun createJson() = Json {
     isLenient = true
     ignoreUnknownKeys = true
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     // TODO: Create campgrounds list
+    private val campgrounds = mutableListOf<Campground>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +42,8 @@ class MainActivity : AppCompatActivity() {
         campgroundsRecyclerView = findViewById(R.id.campgrounds)
 
         // TODO: Set up CampgroundAdapter with campgrounds
+        val campgroundAdapter = CampgroundAdapter(this, campgrounds)
+        campgroundsRecyclerView.adapter = campgroundAdapter
 
 
         campgroundsRecyclerView.layoutManager = LinearLayoutManager(this).also {
@@ -61,11 +65,23 @@ class MainActivity : AppCompatActivity() {
             override fun onSuccess(statusCode: Int, headers: Headers, json: JSON) {
                 Log.i(TAG, "Successfully fetched campgrounds: $json")
                 try {
-                    // TODO: Create the parsedJSON
+                    val parsedJson = createJson().decodeFromString(
+                        CampgroundResponse.serializer(),
+                        json.jsonObject.toString()
+                    )
 
                     // TODO: Do something with the returned json (contains campground information)
+                    parsedJson.data?.let { list ->
+                        campgrounds.addAll(list)
+                    }
+                    // COMPLETED: Save the campgrounds and reload the screen
+                    parsedJson.data?.let { list ->
+                        campgrounds.addAll(list)
 
-                    // TODO: Save the campgrounds and reload the screen
+                        // TODO: Notify the adapter that the dataset has changed
+                        campgroundAdapter.notifyDataSetChanged()
+                    }
+
 
                 } catch (e: JSONException) {
                     Log.e(TAG, "Exception: $e")
