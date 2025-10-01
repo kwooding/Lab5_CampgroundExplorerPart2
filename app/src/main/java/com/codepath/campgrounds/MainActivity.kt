@@ -22,8 +22,12 @@ fun createJson() = Json {
 
 private const val TAG = "CampgroundsMain/"
 private val PARKS_API_KEY = BuildConfig.API_KEY
-private val CAMPGROUNDS_URL =
+ private val CAMPGROUNDS_URL =
     "https://developer.nps.gov/api/v1/campgrounds?api_key=${PARKS_API_KEY}"
+
+//Fixed retrieval
+//private val CAMPGROUNDS_URL = "https://developer.nps.gov/api/v1/campgrounds"
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var campgroundsRecyclerView: RecyclerView
@@ -34,6 +38,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.i(TAG, "API key length = ${BuildConfig.API_KEY.length}")
+        Log.i(TAG, "Requesting campgrounds…")
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
@@ -50,6 +56,9 @@ class MainActivity : AppCompatActivity() {
             val dividerItemDecoration = DividerItemDecoration(this, it.orientation)
             campgroundsRecyclerView.addItemDecoration(dividerItemDecoration)
         }
+
+        //Log.i(TAG, "API key (masked)=${BuildConfig.API_KEY.take(4)}…${BuildConfig.API_KEY.takeLast(4)} len=${BuildConfig.API_KEY.length}")
+        //Log.i(TAG, "Campgrounds URL=$CAMPGROUNDS_URL")
 
         val client = AsyncHttpClient()
         client.get(CAMPGROUNDS_URL, object : JsonHttpResponseHandler() {
